@@ -1,0 +1,35 @@
+BROKER SCHEMA ep
+
+
+
+CREATE COMPUTE MODULE getPaymentsStats_Request
+
+	DECLARE ePaymentStatsAPI EXTERNAL CHARACTER '';
+	
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+
+	SET OutputLocalEnvironment.Variables=InputLocalEnvironment.Variables;
+	SET OutputLocalEnvironment.Variables.eStat.operation = InputLocalEnvironment.REST.Input.Operation;
+	
+	CASE OutputLocalEnvironment.Variables.eStat.operation
+			
+		WHEN 'getPaymentsByMonth' THEN
+			SET OutputLocalEnvironment.Destination.HTTP.RequestURL = ePaymentStatsAPI || '/eService/numberOfPaymentsByMonthJson';
+	
+			SET OutputRoot.JSON.Data.request_type = LOWER(InputLocalEnvironment.REST.Input.Parameters.requestType);
+			SET OutputRoot.JSON.Data.month = InputLocalEnvironment.REST.Input.Parameters.month;
+			
+		WHEN 'getPaymentsPerPeriod' THEN
+			SET OutputLocalEnvironment.Destination.HTTP.RequestURL = ePaymentStatsAPI || '/eService/numberOfPaymentsFromDateToDateJson';
+
+			SET OutputRoot.JSON.Data.request_type = LOWER(InputLocalEnvironment.REST.Input.Parameters.requestType);
+			SET OutputRoot.JSON.Data.start_date = CAST (InputLocalEnvironment.REST.Input.Parameters.startDate AS CHARACTER) || ' 00:00:00';
+			SET OutputRoot.JSON.Data.end_date = CAST (InputLocalEnvironment.REST.Input.Parameters.endDate AS CHARACTER) || ' 23:59:59';
+			
+			
+		END CASE;
+		RETURN TRUE;
+	END;
+
+END MODULE;

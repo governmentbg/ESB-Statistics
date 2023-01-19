@@ -1,0 +1,48 @@
+BROKER SCHEMA ep
+
+
+
+CREATE COMPUTE MODULE getPaymentsStats_Response
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+	-- SET OutputRoot.JSON.Data.stat = InputLocalEnvironment.Variables.statRequest;
+		SET OutputRoot.JSON.Data.value = InputRoot.JSON.Data.value;
+		/*
+	CASE InputLocalEnvironment.Variables.Operation
+		WHEN 'getPaymentsByMonth' THEN
+			
+	--		SET OutputRoot.JSON.Data.month = InputRoot.JSON.Data.Item[1].month;
+			SET OutputRoot.JSON.Data.value = InputRoot.JSON.Data.value;
+		
+		WHEN 'getPaymentsPerPeriod' THEN
+			
+	--		SET OutputRoot.JSON.Data.period = 'PERIOD';
+			SET OutputRoot.JSON.Data.value = InputRoot.JSON.Data.value;
+	END CASE;
+		*/
+	RETURN TRUE;
+	
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+	
+CREATE PROCEDURE SetLocalEvironmentVariables() BEGIN
+	--	SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = eDeliveryAddressURL;
+  		SET OutputLocalEnvironment.Destination.SOAP.Request.Operation = 'SendMessage';
+  		SET OutputLocalEnvironment.Variables.systemOID =  InputLocalEnvironment.Variables.systemOID;
+	    SET OutputLocalEnvironment.Destination.RouterList.DestinationData[1].labelName = InputLocalEnvironment.Variables.systemLABEL ||'-'||OutputLocalEnvironment.Destination.SOAP.Request.Operation;
+
+	END;
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;

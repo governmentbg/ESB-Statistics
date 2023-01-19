@@ -1,0 +1,330 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "title" : "DAEU_Statistics",
+    "version" : "1.0.0",
+    "description" : "DAEU_Statistics"
+  },
+  "host":"172.23.155.141:7843",
+  "basePath":"/stats/connector/v1",
+  "schemes":["https"],
+  "paths" : {
+    "/payments/perperiod" : {
+      "get" : {
+        "operationId" : "getPaymentsPerPeriod",
+        "description" : "Number of payments or other statuses form date to date",
+        "produces" : [ "application/json" ],     
+        "responses" : {
+          "200" : {
+            "description" : "The operation was successful",
+            "schema" : {
+              "$ref" : "#/definitions/StatResponse"
+            }
+          },
+          "400" : {
+            "description" : "Bad request.",
+            "schema" : {
+              "$ref" : "#/definitions/CommonException"
+            }
+          },
+          "500" : {
+            "description" : "Error in processing the request",
+            "schema" : {
+              "$ref" : "#/definitions/ProcessingException"
+            }
+          }
+        },
+        "parameters" : [ {
+          "$ref" : "#/parameters/paymentStatParam"
+        }, {
+          "$ref" : "#/parameters/startDateParam"
+        }, {
+          "$ref" : "#/parameters/endDateParam"
+        } ]
+      }
+    },
+    "/payments/bymonth" : {
+      "get" : {
+        "operationId" : "getPaymentsByMonth",
+        "description" : "Retrieve payments by month",
+        "produces" : [ "application/json" ],       
+        "responses" : {
+          "200" : {
+            "description" : "The operation was successful.",
+            "schema" : {
+              "$ref" : "#/definitions/StatResponse"
+            }
+          },
+          "400" : {
+            "description" : "Bad request",
+            "schema" : {
+              "$ref" : "#/definitions/CommonException"
+            }
+          },
+          "500" : {
+            "description" : "Error in processing the request",
+            "schema" : {
+              "$ref" : "#/definitions/ProcessingException"
+            }
+          }
+        },
+        
+      "parameters" : [ {
+          "$ref" : "#/parameters/paymentStatParam"
+        }, {
+          "$ref" : "#/parameters/monthParam"
+        } ]
+      }
+    },
+    "/messages/perperiod" : {
+      "get" : {
+        "operationId" : "getMessagesPerPeriod",
+        "description" : "Number of messages in in/out-box per period",
+        "produces" : [ "application/json" ],
+        "responses" : {
+          "200" : {
+            "description" : "The operation was successful",
+            "schema" : {
+              "$ref" : "#/definitions/StatResponse"
+            }
+          },
+          "400" : {
+            "description" : "Bad request",
+            "schema" : {
+              "$ref" : "#/definitions/CommonException"
+            }
+          },
+           "401" : {
+            "description" : "Unauthorized",
+            "schema" : {
+              "$ref" : "#/definitions/CommonException"
+            }
+          },
+          "500" : {
+            "description" : "Error in processing the request",
+            "schema" : {
+              "$ref" : "#/definitions/ProcessingException"
+            }
+          }
+        },
+         "parameters" : [ {
+          "$ref" : "#/parameters/messageDirectionParam"
+        }, {
+          "$ref" : "#/parameters/startDateParam"
+        }, {
+          "$ref" : "#/parameters/endDateParam"
+        } ]
+      }
+    },
+    "/messages/bymonth" : {
+      "get" : {
+        "operationId" : "getMessagesByMonth",        
+        "description" : "Retrieve messages by month",
+        "produces" : [ "application/json" ],
+        "responses" : {
+          "200" : {
+            "description" : "The operation was successful",
+            "schema" : {
+              "$ref" : "#/definitions/StatResponse"
+            }
+          },
+          "400" : {
+            "description" : "Bad request",
+            "schema" : {
+              "$ref" : "#/definitions/CommonException"
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "schema" : {
+              "$ref" : "#/definitions/CommonException"
+            }
+          },
+          "500" : {
+            "description" : "Error in processing the request",
+            "schema" : {
+              "$ref" : "#/definitions/ProcessingException"
+            }
+          }
+        },
+         "parameters" : [ {
+          "$ref" : "#/parameters/messageDirectionParam"
+        }, {
+          "$ref" : "#/parameters/monthParam"
+        } ]
+      }
+    }
+  },
+  "parameters" : {
+    "pageNumberParam" : {
+      "in" : "query",
+      "name" : "pageNumber",
+      "required" : false,
+      "type" : "integer",
+      "minimum" : 0,
+      "description" : "The page number from which to collect the result set"
+    },
+    "pageSizeParam" : {
+      "in" : "query",
+      "name" : "pageSize",
+      "required" : false,
+      "type" : "integer",
+      "minimum" : 1,
+      "maximum" : 50,
+      "default" : 20,
+      "description" : "The number of items in page to return"
+    },
+    "messageDirectionParam" : {
+      "in" : "query",
+      "name" : "direction",
+      "required" : false,
+      "type" : "string",
+      "enum" : [ "SENT", "RECEIVED", "RECEIVED_NEW" ]
+    },
+    "paymentTypeParam" : {
+      "in" : "query",
+      "name" : "paymentType",
+      "required" : true,
+      "type" : "string",
+      "enum" : [ "PENDING", "PAID" ]
+    },
+    "paymentStatParam": {
+          "name" : "requestType",
+          "in" : "query",
+          "type" : "string",
+          "required" : true,
+          "enum" : [ "PAYMENTS", "REQUEST"]
+      },
+    "originTypeParam" : {
+      "in" : "query",
+      "name" : "originSystem",
+      "required" : true,
+      "description" : "Available systems",
+      "type" : "string",
+      "enum" : [ "OAUTH", "INTEGRATION", "EDELIVERY", "EPAYMENT", "REGIX" ]
+    },
+    "authorisationParam" : {
+      "name" : "miscinfo",
+      "in" : "header",
+      "type" : "string",
+      "required" : false
+    },
+    "serviceOIDParam" : {
+      "name" : "serviceOID",
+      "in" : "header",
+      "type" : "string",
+      "required" : false
+    },
+    "operatorIDParam" : {
+      "name" : "operatorUID",
+      "in" : "header",
+      "type" : "string",
+      "required" : false
+    },
+    "subjectIDParam" : {
+      "name" : "electronicId",
+      "in" : "query",
+      "type" : "string",
+      "required" : true
+    },
+    "personIDParam" : {
+      "name" : "personUID",
+      "in" : "query",
+      "type" : "string",
+      "required" : false
+    },
+	"startDateParam":{
+	 "name" : "startDate",
+          "in" : "query",
+          "type" : "string",
+          "required" : true,
+          "format" : "full-date"
+		  },
+	"endDateParam":{
+          "name" : "endDate",
+          "in" : "query",
+          "type" : "string",
+          "required" : true,
+          "format" : "full-date"
+     
+        }, 
+    "monthParam":{
+          "name" : "month",
+          "in" : "query",
+          "type" : "string",
+          "required" : true,
+          "format" : "date-fullyear\"-\"date-month"
+        }		
+		  
+  },
+  "definitions" : {
+    "OriginSystem" : {
+      "title" : "OriginSystem",
+      "description" : "Available systems",
+      "type" : "string",
+      "enum" : [ "OAUTH", "INTEGRATION", "EDELIVERY", "EPAYMENT", "REGIX" ]
+    },
+    "CommonException" : {
+      "title" : "CommonException",
+      "type" : "object",
+      "properties" : {
+        "failureOrigin" : {
+          "$ref" : "#/definitions/OriginSystem"
+        },
+        "cause" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/Cause"
+          }
+        }
+      }
+    },
+    "ProcessingException" : {
+      "title" : "ProcessingException",
+      "type" : "object",
+      "properties" : {
+        "failureOrigin" : {
+          "$ref" : "#/definitions/OriginSystem"
+        },
+        "cause" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/Cause"
+          }
+        },
+        "retryAfter" : {
+          "description" : "An optional parameter that specifies the required time in seconds to wait between requests",
+          "type" : "integer",
+          "format" : "int32"
+        }
+      },
+      "required" : [ "retryAfter" ]
+    },
+    "Cause" : {
+      "title" : "Cause",
+      "type" : "object",
+      "properties" : {
+        "code" : {
+          "type" : "string"
+        },
+        "message" : {
+          "type" : "string"
+        }
+      },
+      "required" : [ "code", "message" ]
+    },
+    "StatResponse" : {
+      "type" : "object",
+      "properties" : {
+        "value" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      },
+      "example": {
+        "value": "15"
+      }
+  
+    }
+  }
+}
